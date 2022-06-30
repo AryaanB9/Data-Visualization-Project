@@ -1,0 +1,969 @@
+---
+title: "Five_Minus_Zero"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+    theme: 
+      version: 4
+    # runtime: shiny
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(plotly)
+library(reshape2)
+library(ggplot2)
+library(waffle)
+library(sp)
+library(RColorBrewer)
+library(ggthemes)
+library(tm)
+library(SnowballC)
+library(wordcloud)
+# bslib::bs_themer()
+```
+
+
+
+Home Page
+================================================================================
+
+Row {data-width=1000}
+--------------------------------------------------------------------------------
+
+```{r picture, echo = F, out.width = '100%', out.height = "100%"}
+knitr::include_graphics("C:/Users/Zeus/Downloads/Five_Minus_Zero/Five_Minus_Zero_Image.png")
+```
+
+
+
+State-wise Yield
+================================================================================
+
+Column {data-width=800 .tabset}
+--------------------------------------------------------------------------------
+### Foodgrains
+```{r}
+ind1=readRDS("C:/Users/Zeus/Downloads/Five_Minus_Zero/India Map Graph/IND_adm1.rds")
+ind1$NAME_1 = as.factor(ind1$NAME_1)
+
+colorFoodgrains = c(1, 0.511, 1, 0.330, 0.351, 1, 0.257, 1, 1, 1, 0.355, 0.721, 1, 1, 0.319, 0.311, 1, 1, 0.266, 0.216, 1, 1, 1, 1, 1, 0.297, 1, 0.826, 0.312, 1, 0.450, 1, 1, 0.486, 0.382, 0.523)
+colorRice = c(1, 0.861, 1, 0.450, 0.398, 1, 0.390, 1, 1, 1, 0.534, 0.837, 1, 1, 0.485, 0.753, 0.671, 1, 0.284, 0.478, 1, 1, 1, 1, 1, 0.445, 1, 0.900, 0.207, 1, 0.813, 1, 1, 0.586, 1, 0.720)
+colorWheat = c(1, 1, 1, 0.225, 0.393, 1, 1, 1, 1, 1, 0.551, 0.855, 0.301, 0.331, 0.319, 0.164, 1, 1, 0.378, 0.295, 1, 1, 1, 1, 1, 1, 1, 0.885, 0.589, 1, 1, 1, 1, 0.572, 0.416, 0.498)
+colorCoarseCereals = c(1, 0.666, 1, 1, 0.532, 1, 0.149, 1, 1, 1, 0.287, 0.361, 0.479, 0.334, 0.285, 0.369, 1, 1, 0.269, 0.219, 1, 1, 1, 1, 1, 0.272, 1, 0.718, 0.207, 1, 0.453, 1, 1, 0.343, 0.283, 0.690)
+
+spplot(ind1,"NAME_1", col.regions=rgb(0.2,colorFoodgrains,0.2), colorkey=T, main="State-wise Yield of Foodgrains")
+```
+
+### Rice
+```{r}
+spplot(ind1,"NAME_1", col.regions=rgb(0.2,0.2, colorRice), colorkey=T, main="State-wise Yield of Rice")
+```
+
+### Wheat
+```{r}
+spplot(ind1,"NAME_1", col.regions=rgb(colorWheat,0.2,0.2), colorkey=T, main="State-wise Yield of Wheat")
+```
+
+### Coarse Cereals
+```{r}
+spplot(ind1,"NAME_1", col.regions=rgb(0.2, (colorCoarseCereals-0.1), colorCoarseCereals), colorkey=T, main="State-wise Yield of Coarse Cereals")
+```
+
+
+Column {data-width=200 .tabset}
+--------------------------------------------------------------------------------
+
+### Foodgrains
+```{r picture1, echo = F, out.width = '100%', out.height = "100%"}
+knitr::include_graphics("C:/Users/Zeus/Downloads/Five_Minus_Zero/ColorBar (1).png")
+```
+
+### Rice
+```{r picture2, echo = F, out.width = '100%', out.height = "100%"}
+knitr::include_graphics("C:/Users/Zeus/Downloads/Five_Minus_Zero/ColorBar (2).png")
+```
+
+### Wheat
+```{r picture3, echo = F, out.width = '100%', out.height = "100%"}
+knitr::include_graphics("C:/Users/Zeus/Downloads/Five_Minus_Zero/ColorBar (3).png")
+```
+
+### Coarse Cereals
+```{r picture4, echo = F, fig.cap = "Inferences - So here Inferences will come", out.width = '100%', out.height = "100%"}
+knitr::include_graphics("C:/Users/Zeus/Downloads/Five_Minus_Zero/ColorBar (4).png")
+```
+
+
+
+Production
+================================================================================
+
+Row {.tabset}
+--------------------------------------------------------------------------------
+
+### Foodgrains
+```{r}
+ProdFoodgrains <- read.csv("C:/Users/Zeus/Downloads/Five_Minus_Zero/Project DataFiles/Aryaan/prodFoodgrains.csv", header=TRUE);
+FoodgrainsDF <- data.frame(ProdFoodgrains);
+
+ProdRice <- read.csv("C:/Users/Zeus/Downloads/Five_Minus_Zero/Project DataFiles/Aryaan/prodRice.csv", header=TRUE);
+RiceDF <- data.frame(ProdRice);
+
+ProdWheat <- read.csv("C:/Users/Zeus/Downloads/Five_Minus_Zero/Project DataFiles/Aryaan/prodWheat.csv", header=TRUE);
+WheatDF <- data.frame(ProdWheat);
+
+ProdCoarseCereals <- read.csv("C:/Users/Zeus/Downloads/Five_Minus_Zero/Project DataFiles/Aryaan/prodCoarseCereals.csv", header=TRUE);
+CoarseCerealsDF <- data.frame(ProdCoarseCereals);
+
+figFoodgrains <- plot_ly(FoodgrainsDF, x = ~Years, y = ~Andhra.Pradesh, type = 'bar', name = 'Andhra Pradesh');
+figFoodgrains <- figFoodgrains %>% add_trace(y = ~Gujarat, name = 'Gujarat');
+figFoodgrains <- figFoodgrains %>% add_trace(y = ~Haryana, name = 'Haryana');
+figFoodgrains <- figFoodgrains %>% add_trace(y = ~Punjab, name = 'Punjab');
+figFoodgrains <- figFoodgrains %>% add_trace(y = ~Tamil.Nadu, name = 'Tamil Nadu');
+figFoodgrains <- figFoodgrains %>% add_trace(y = ~Uttar.Pradesh, name = 'Uttar Pradesh');
+figFoodgrains <- figFoodgrains %>% add_trace(y = ~West.Bengal, name = 'West Bengal');
+figFoodgrains <- figFoodgrains %>% layout(title = "Yield of Foodgrains of Top 7 States", yaxis = list(title = 'Yield in kg/ha'), barmode = 'stack');
+figFoodgrains
+```
+
+### Rice
+```{r}
+figRice <- plot_ly(RiceDF, x = ~Years, y = ~Andhra.Pradesh, type = 'bar', name = 'Andhra Pradesh');
+figRice <- figRice %>% add_trace(y = ~Haryana, name = 'Haryana');
+figRice <- figRice %>% add_trace(y = ~Karnataka, name = 'Karnataka');
+figRice <- figRice %>% add_trace(y = ~Kerala, name = 'Kerala');
+figRice <- figRice %>% add_trace(y = ~Punjab, name = 'Punjab');
+figRice <- figRice %>% add_trace(y = ~Tamil.Nadu, name = 'Tamil Nadu');
+figRice <- figRice %>% add_trace(y = ~West.Bengal, name = 'West Bengal');
+figRice <- figRice %>% layout(title = "Yield of Rice of Top 7 States", yaxis = list(title = 'Yield in kg/ha'), barmode = 'stack');
+figRice
+```
+
+### Wheat
+```{r}
+figWheat <- plot_ly(WheatDF, x = ~Years, y = ~Gujarat, type = 'bar', name = 'Gujarat');
+figWheat <- figWheat %>% add_trace(y = ~Haryana, name = 'Haryana');
+figWheat <- figWheat %>% add_trace(y = ~Punjab, name = 'Punjab');
+figWheat <- figWheat %>% add_trace(y = ~Rajasthan, name = 'Rajasthan');
+figWheat <- figWheat %>% add_trace(y = ~Uttar.Pradesh, name = 'Uttar Pradesh');
+figWheat <- figWheat %>% add_trace(y = ~Uttarakhand, name = 'Uttarakhand');
+figWheat <- figWheat %>% add_trace(y = ~West.Bengal, name = 'West Bengal');
+figWheat <- figWheat %>% layout(title = "Yield of Wheat of Top 7 States", yaxis = list(title = 'Yield in kg/ha'), barmode = 'stack');
+figWheat
+```
+
+### Coarse Cereals
+```{r}
+figCoarseCereals <- plot_ly(CoarseCerealsDF, x = ~Years, y = ~Andhra.Pradesh, type = 'bar', name = 'Andhra Pradesh');
+figCoarseCereals <- figCoarseCereals %>% add_trace(y = ~Bihar, name = 'Bihar');
+figCoarseCereals <- figCoarseCereals %>% add_trace(y = ~Himachal.Pradesh, name = 'Himachal Pradesh');
+figCoarseCereals <- figCoarseCereals %>% add_trace(y = ~Karnataka, name = 'Karnataka');
+figCoarseCereals <- figCoarseCereals %>% add_trace(y = ~Punjab, name = 'Punjab');
+figCoarseCereals <- figCoarseCereals %>% add_trace(y = ~Tamil.Nadu, name = 'Tamil Nadu');
+figCoarseCereals <- figCoarseCereals %>% add_trace(y = ~West.Bengal, name = 'West Bengal');
+figCoarseCereals <- figCoarseCereals %>% layout(title = "Yield of Coarse Cereals of Top 7 States", yaxis = list(title = 'Yield in kg/ha'), barmode = 'stack');
+figCoarseCereals
+```
+
+
+
+Comparison of Commodities
+================================================================================
+
+Row {.tabset}
+--------------------------------------------------------------------------------
+
+### Maize
+```{r}
+Prod1 <- read.csv("C:/Users/Zeus/Downloads/Five_Minus_Zero/Project DataFiles/Aryaan/datafile (2) - Copy1_P.csv")
+Years <- Prod1$Year;
+ProdData1 <- data.frame(Years, Prod1$Rice, Prod1$Wheat, Prod1$Maize, Prod1$Cereals, Prod1$Tea, Prod1$Coffee, Prod1$Fruits);
+
+Yield1 <- read.csv("C:/Users/Zeus/Downloads/Five_Minus_Zero/Project DataFiles/Aryaan/datafile (2) - Copy1_Y.csv")
+YieldData1 <- data.frame(Years, Yield1$Rice, Yield1$Wheat, Yield1$Maize, Yield1$Cereals, Yield1$Tea, Yield1$Coffee, Yield1$Fruits);
+
+figMaize<- plot_ly(ProdData1, x = ~Years, y = ~Prod1$Maize, name = 'Maize Production', type = 'scatter', mode = 'lines',
+                   line = list(color = 'rgb(205, 12, 24)', width = 4), marker = list(color = 'rgba(22, 96, 167,1)', size = 8))
+figMaize <- figMaize %>% add_trace(y = ~Yield1$Maize, name = 'Maize Yield', line = list(color = 'rgb(22, 96, 167)', width = 4), marker = list(color = 'rgba(205, 12, 24,1)', size = 8))
+figMaize <- figMaize %>% layout(title = "Production vs Yield of Maize from 2016-2020",
+                                xaxis = list(title = "Years"),
+                                yaxis = list (title = "Production or Yield in Ton/Hectare"))
+figMaize
+```
+
+### Cereals
+```{r}
+figCereals <- plot_ly(ProdData1, x = ~Years, y = ~Prod1$Cereals, name = 'Cereals Production', type = 'scatter', mode = 'lines',
+               line = list(color = 'rgb(205, 12, 24)', width = 4), marker = list(color = 'rgba(22, 96, 167,1)', size = 8))
+figCereals <- figCereals %>% add_trace(y = ~Yield1$Cereals, name = 'Cereals Yield', line = list(color = 'rgb(22, 96, 167)', width = 4), marker = list(color = 'rgba(205, 12, 24,1)', size = 8))
+figCereals <- figCereals %>% layout(title = "Production vs Yield of Cereals from 2016-2020",
+                                xaxis = list(title = "Years"),
+                                yaxis = list (title = "Production or Yield in Ton/Hectare"))
+figCereals
+```
+
+### Tea
+```{r}
+figTea <- plot_ly(ProdData1, x = ~Years, y = ~Prod1$Tea, name = 'Tea Production', type = 'scatter', mode = 'lines',
+                      line = list(color = 'rgb(205, 12, 24)', width = 4), marker = list(color = 'rgba(22, 96, 167,1)', size = 8))
+figTea <- figTea %>% add_trace(y = ~Yield1$Tea, name = 'Tea Yield', line = list(color = 'rgb(22, 96, 167)', width = 4), marker = list(color = 'rgba(205, 12, 24,1)', size = 8))
+figTea <- figTea %>% layout(title = "Production vs Yield of Tea from 2016-2020",
+                                    xaxis = list(title = "Years"),
+                                    yaxis = list (title = "Production or Yield in Ton/Hectare"))
+figTea
+```
+
+### Coffee
+```{r}
+figCoffee <- plot_ly(ProdData1, x = ~Years, y = ~Prod1$Coffee, name = 'Coffee Production', type = 'scatter', mode = 'lines',
+                  line = list(color = 'rgb(205, 12, 24)', width = 4), marker = list(color = 'rgba(22, 96, 167,1)', size = 8))
+figCoffee <- figCoffee %>% add_trace(y = ~Yield1$Coffee, name = 'Coffee Yield', line = list(color = 'rgb(22, 96, 167)', width = 4), marker = list(color = 'rgba(205, 12, 24,1)', size = 8))
+figCoffee <- figCoffee %>% layout(title = "Production vs Yield of Coffee from 2016-2020",
+                            xaxis = list(title = "Years"),
+                            yaxis = list (title = "Production or Yield in Ton/Hectare"))
+figCoffee
+```
+
+### Fruits
+```{r}
+figFruits <- plot_ly(ProdData1, x = ~Years, y = ~Prod1$Fruits, name = 'Fruits Production', type = 'scatter', mode = 'lines',
+                     line = list(color = 'rgb(205, 12, 24)', width = 4), marker = list(color = 'rgba(22, 96, 167,1)', size = 8))
+figFruits <- figFruits %>% add_trace(y = ~Yield1$Fruits, name = 'Fruits Yield', line = list(color = 'rgb(22, 96, 167)', width = 4), marker = list(color = 'rgba(205, 12, 24,1)', size = 8))
+figFruits <- figFruits %>% layout(title = "Production vs Yield of Fruits from 2016-2020",
+                                  xaxis = list(title = "Years"),
+                                  yaxis = list (title = "Production or Yield in Ton/Hectare"))
+figFruits
+```
+
+### Rice
+```{r}
+figRice<- plot_ly(ProdData1, x = ~Years, y = ~Prod1$Rice, name = 'Rice Production', type = 'scatter', mode = 'lines',
+               line = list(color = 'rgb(205, 12, 24)', width = 4), marker = list(color = 'rgba(22, 96, 167,1)', size = 8))
+figRice <- figRice %>% add_trace(y = ~Yield1$Rice, name = 'Rice Yield', line = list(color = 'rgb(22, 96, 167)', width = 4), marker = list(color = 'rgba(205, 12, 24,1)', size = 8))
+figRice <- figRice %>% layout(title = "Production vs Yield of Rice from 2016-2020",
+                      xaxis = list(title = "Years"),
+                      yaxis = list (title = "Production or Yield in Ton/Hectare"))
+figRice
+```
+
+### Wheat
+```{r}
+figWheat<- plot_ly(ProdData1, x = ~Years, y = ~Prod1$Wheat, name = 'Wheat Production', type = 'scatter', mode = 'lines',
+                  line = list(color = 'rgb(205, 12, 24)', width = 4), marker = list(color = 'rgba(22, 96, 167,1)', size = 8))
+figWheat <- figWheat %>% add_trace(y = ~Yield1$Wheat, name = 'Wheat Yield', line = list(color = 'rgb(22, 96, 167)', width = 4), marker = list(color = 'rgba(205, 12, 24,1)', size = 8))
+figWheat <- figWheat %>% layout(title = "Production vs Yield of Wheat from 2016-2020",
+                              xaxis = list(title = "Years"),
+                              yaxis = list (title = "Production or Yield in Ton/Hectare"))
+figWheat
+```
+
+
+Land Distribution
+================================================================================
+
+Column {.tabset}
+--------------------------------------------------------------------------------
+
+<div align="center">**Data According to Years by Waffle Chart**</div>
+
+### 1990-91
+```{r}
+data<- read.csv(file="C:/Users/Zeus/Downloads/Five_Minus_Zero/Project DataFiles/Abhirami/final.csv",header=TRUE)
+attach(data)
+dmelt<-melt(data,id="years")
+
+a<-dmelt[22,"value"]
+b<-dmelt[132,"value"]
+c<-dmelt[62,"value"]
+d<-dmelt[102,"value"]
+e<-dmelt[32,"value"]
+land <- c('Forest'=a, 'Net Area Sown'= b,'Other Uncultivated land excluding'=c,'Fallow land'=d,'Area not available for cultivation'=e)
+
+waffle(land/5, rows=5, size=0.6,
+       colors=c("#44D2AC", "#E48B8B", "#B67093",
+                "#3A9ABD", "#CFE252"),
+       title=("             Land Distribution 1990-91"), xlab="1 square = 5 million hectares")
+
+
+```
+
+### 2000-01
+```{r}
+a<-dmelt[23,"value"]
+b<-dmelt[133,"value"]
+c<-dmelt[63,"value"]
+d<-dmelt[103,"value"]
+e<-dmelt[33,"value"]
+land <- c('Forest'=a, 'Net Area Sown'= b,'Other Uncultivated land excluding'=c,'Fallow land'=d,'Area not available for cultivation'=e)
+
+waffle(land/5, rows=5, size=0.6,
+       colors=c("#44D2AC", "#E48B8B", "#B67093",
+                "#3A9ABD", "#CFE252"),
+       title=("             Land Distribution 2000-01"), xlab="1 square = 5 million hectares")
+
+
+```
+
+### 2009-10
+```{r}
+a<-dmelt[24,"value"]
+b<-dmelt[134,"value"]
+c<-dmelt[64,"value"]
+d<-dmelt[104,"value"]
+e<-dmelt[34,"value"]
+land <- c('Forest'=a, 'Net Area Sown'= b,'Other Uncultivated land excluding'=c,'Fallow land'=d,'Area not available for cultivation'=e)
+
+waffle(land/5, rows=5, size=0.6,
+       colors=c("#44D2AC", "#E48B8B", "#B67093",
+                "#3A9ABD", "#CFE252"),
+       title=("             Land Distribution 2009-10"), xlab="1 square = 5 million hectares")
+
+
+```
+
+### 2010-11
+```{r}
+a<-dmelt[25,"value"]
+b<-dmelt[135,"value"]
+c<-dmelt[65,"value"]
+d<-dmelt[105,"value"]
+e<-dmelt[35,"value"]
+land <- c('Forest'=a, 'Net Area Sown'= b,'Other Uncultivated land excluding'=c,'Fallow land'=d,'Area not available for cultivation'=e)
+
+waffle(land/5, rows=5, size=0.6,
+       colors=c("#44D2AC", "#E48B8B", "#B67093",
+                "#3A9ABD", "#CFE252"),
+       title=("             Land Distribution 2010-11"), xlab="1 square = 5 million hectares")
+
+
+```
+
+### 2011-12
+```{r}
+a<-dmelt[26,"value"]
+b<-dmelt[136,"value"]
+c<-dmelt[66,"value"]
+d<-dmelt[106,"value"]
+e<-dmelt[36,"value"]
+land <- c('Forest'=a, 'Net Area Sown'= b,'Other Uncultivated land excluding'=c,'Fallow land'=d,'Area not available for cultivation'=e)
+land
+waffle(land/5, rows=5, size=0.6,
+       colors=c("#44D2AC", "#E48B8B", "#B67093",
+                "#3A9ABD", "#CFE252"),
+       title=("             Land Distribution 2011-12"), xlab="1 square = 5 million hectares")
+print(waffle)
+
+
+```
+
+### 2012-13
+```{r}
+a<-dmelt[27,"value"]
+b<-dmelt[137,"value"]
+c<-dmelt[67,"value"]
+d<-dmelt[107,"value"]
+e<-dmelt[37,"value"]
+land <- c('Forest'=a, 'Net Area Sown'= b,'Other Uncultivated land excluding'=c,'Fallow land'=d,'Area not available for cultivation'=e)
+
+waffle(land/5, rows=5, size=0.6,
+       colors=c("#44D2AC", "#E48B8B", "#B67093",
+                "#3A9ABD", "#CFE252"),
+       title=("             Land Distribution 2012-13"), xlab="1 square = 5 million hectares")
+
+
+```
+
+### 2013-14
+```{r}
+a<-dmelt[28,"value"]
+b<-dmelt[138,"value"]
+c<-dmelt[68,"value"]
+d<-dmelt[108,"value"]
+e<-dmelt[38,"value"]
+land <- c('Forest'=a, 'Net Area Sown'= b,'Other Uncultivated land excluding'=c,'Fallow land'=d,'Area not available for cultivation'=e)
+
+waffle(land/5, rows=5, size=0.6,
+       colors=c("#44D2AC", "#E48B8B", "#B67093",
+                "#3A9ABD", "#CFE252"),
+       title=("             Land Distribution 2013-14"), xlab="1 square = 5 million hectares")
+
+
+```
+
+### 2014-15
+```{r}
+a<-dmelt[29,"value"]
+b<-dmelt[139,"value"]
+c<-dmelt[69,"value"]
+d<-dmelt[109,"value"]
+e<-dmelt[39,"value"]
+land <- c('Forest'=a, 'Net Area Sown'= b,'Other Uncultivated land excluding'=c,'Fallow land'=d,'Area not available for cultivation'=e)
+
+waffle(land/5, rows=5, size=0.6,
+       colors=c("#44D2AC", "#E48B8B", "#B67093",
+                "#3A9ABD", "#CFE252"),
+       title=("             Land Distribution 2014-15"), xlab="1 square = 5 million hectares")
+
+
+```
+
+### 2015-16
+```{r}
+a<-dmelt[30,"value"]
+b<-dmelt[140,"value"]
+c<-dmelt[70,"value"]
+d<-dmelt[110,"value"]
+e<-dmelt[40,"value"]
+land <- c('Forest'=a, 'Net Area Sown'= b,'Other Uncultivated land excluding'=c,'Fallow land'=d,'Area not available for cultivation'=e)
+
+waffle(land/5, rows=5, size=0.6,
+       colors=c("#44D2AC", "#E48B8B", "#B67093",
+                "#3A9ABD", "#CFE252"),
+       title=("             Land Distribution 2015-16"), xlab="1 square = 5 million hectares")
+
+
+```
+
+
+Column {.tabset}
+--------------------------------------------------------------------------------
+
+<div align="center">**Data According to Years by Pie Chart**</div>
+
+### 1990-91
+```{r}
+data<- read.csv(file="C:/Users/Zeus/Downloads/Five_Minus_Zero/Project DataFiles/Abhirami/final.csv",header=TRUE)
+attach(data)
+dmelt<-melt(data,id="years")
+
+a<-dmelt[22,"value"]
+b<-dmelt[132,"value"]
+c<-dmelt[62,"value"]
+d<-dmelt[102,"value"]
+e<-dmelt[32,"value"]
+dat<-c(a,b,c,d,e)
+
+lab<-c('Forest', 'Net Area Sown','Other Uncultivated land excluding','Fallow land','Area not available for cultivation')
+
+fig <- plot_ly(data, labels = lab, values = dat, type = 'pie',marker = list(colors = c("#44D2AC", "#E48B8B", "#B67093",
+                                                                                        "#3A9ABD", "#CFE252")))
+fig <- fig %>% layout(
+                      xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+                      yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+fig
+
+```
+
+### 2000-01
+```{r}
+a<-dmelt[23,"value"]
+b<-dmelt[133,"value"]
+c<-dmelt[63,"value"]
+d<-dmelt[103,"value"]
+e<-dmelt[33,"value"]
+dat<-c(a,b,c,d,e)
+
+lab<-c('Forest', 'Net Area Sown','Other Uncultivated land excluding','Fallow land','Area not available for cultivation')
+
+fig <- plot_ly(data, labels = lab, values = dat, type = 'pie',marker = list(colors = c("#44D2AC", "#E48B8B", "#B67093",
+                                                                                       "#3A9ABD", "#CFE252")))
+fig <- fig %>% layout(
+                      xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+                      yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+fig
+```
+
+### 2009-10
+```{r}
+a<-dmelt[24,"value"]
+b<-dmelt[134,"value"]
+c<-dmelt[64,"value"]
+d<-dmelt[104,"value"]
+e<-dmelt[34,"value"]
+dat<-c(a,b,c,d,e)
+
+lab<-c('Forest', 'Net Area Sown','Other Uncultivated land excluding','Fallow land','Area not available for cultivation')
+
+fig <- plot_ly(data, labels = lab, values = dat, type = 'pie',marker = list(colors = c("#44D2AC", "#E48B8B", "#B67093",
+                                                                                       "#3A9ABD", "#CFE252")))
+fig <- fig %>% layout(
+                      xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+                      yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+fig
+```
+
+### 2010-11
+```{r}
+a<-dmelt[25,"value"]
+b<-dmelt[135,"value"]
+c<-dmelt[65,"value"]
+d<-dmelt[105,"value"]
+e<-dmelt[35,"value"]
+dat<-c(a,b,c,d,e)
+
+lab<-c('Forest', 'Net Area Sown','Other Uncultivated land excluding','Fallow land','Area not available for cultivation')
+
+fig <- plot_ly(data, labels = lab, values = dat, type = 'pie',marker = list(colors = c("#44D2AC", "#E48B8B", "#B67093",
+                                                                                       "#3A9ABD", "#CFE252")))
+fig <- fig %>% layout(
+                      xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+                      yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+fig
+```
+
+### 2011-12
+```{r}
+a<-dmelt[26,"value"]
+b<-dmelt[136,"value"]
+c<-dmelt[66,"value"]
+d<-dmelt[106,"value"]
+e<-dmelt[36,"value"]
+dat<-c(a,b,c,d,e)
+
+lab<-c('Forest', 'Net Area Sown','Other Uncultivated land excluding','Fallow land','Area not available for cultivation')
+
+fig <- plot_ly(data, labels = lab, values = dat, type = 'pie',marker = list(colors = c("#44D2AC", "#E48B8B", "#B67093",
+                                                                                       "#3A9ABD", "#CFE252")))
+fig <- fig %>% layout(
+                      xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+                      yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+fig
+```
+
+### 2012-13
+```{r}
+a<-dmelt[27,"value"]
+b<-dmelt[137,"value"]
+c<-dmelt[67,"value"]
+d<-dmelt[107,"value"]
+e<-dmelt[37,"value"]
+dat<-c(a,b,c,d,e)
+
+lab<-c('Forest', 'Net Area Sown','Other Uncultivated land excluding','Fallow land','Area not available for cultivation')
+
+fig <- plot_ly(data, labels = lab, values = dat, type = 'pie',marker = list(colors = c("#44D2AC", "#E48B8B", "#B67093",
+                                                                                       "#3A9ABD", "#CFE252")))
+fig <- fig %>% layout(
+                      xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+                      yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+fig
+```
+
+### 2013-14
+```{r}
+a<-dmelt[28,"value"]
+b<-dmelt[138,"value"]
+c<-dmelt[68,"value"]
+d<-dmelt[108,"value"]
+e<-dmelt[38,"value"]
+dat<-c(a,b,c,d,e)
+
+lab<-c('Forest', 'Net Area Sown','Other Uncultivated land excluding','Fallow land','Area not available for cultivation')
+
+fig <- plot_ly(data, labels = lab, values = dat, type = 'pie',marker = list(colors = c("#44D2AC", "#E48B8B", "#B67093",
+                                                                                       "#3A9ABD", "#CFE252")))
+fig <- fig %>% layout(
+                      xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+                      yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+
+fig
+```
+
+### 2014-15
+```{r}
+a<-dmelt[29,"value"]
+b<-dmelt[139,"value"]
+c<-dmelt[69,"value"]
+d<-dmelt[109,"value"]
+e<-dmelt[39,"value"]
+dat<-c(a,b,c,d,e)
+
+lab<-c('Forest', 'Net Area Sown','Other Uncultivated land excluding','Fallow land','Area not available for cultivation')
+
+fig <- plot_ly(data, labels = lab, values = dat, type = 'pie',marker = list(colors = c("#44D2AC", "#E48B8B", "#B67093",
+                                                                                       "#3A9ABD", "#CFE252")))
+fig <- fig %>% layout(
+                      xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+                      yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+fig
+
+
+```
+
+### 2015-16
+```{r}
+a<-dmelt[30,"value"]
+b<-dmelt[140,"value"]
+c<-dmelt[70,"value"]
+d<-dmelt[110,"value"]
+e<-dmelt[40,"value"]
+dat<-c(a,b,c,d,e)
+
+lab<-c('Forest', 'Net Area Sown','Other Uncultivated land excluding','Fallow land','Area not available for cultivation')
+
+fig <- plot_ly(data, labels = lab, values = dat, type = 'pie',marker = list(colors = c("#44D2AC", "#E48B8B", "#B67093",
+                                                                                       "#3A9ABD", "#CFE252")))
+fig <- fig %>% layout(
+                      xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+                      yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+fig
+```
+
+
+
+Productivity Scale
+================================================================================
+
+### Land Usage using Line Graph
+
+```{r}
+LineDataAb<- read.csv(file="C:/Users/Zeus/Downloads/Five_Minus_Zero/Project DataFiles/Abhirami/final.csv",header=TRUE)
+attach(LineDataAb)
+
+figLine <- plot_ly(LineDataAb, x = ~years, y = ~Total_Cropped_Area_.Gross.Cropped.Area., name = 'Gross Cropped Area', type = 'scatter', mode = 'lines',
+               line = list(shape ='spline',color = 'rgb(205, 12, 24)', width = 4),mode = 'markers', marker = list(color = 'rgba(205,12,24)', size = 12)) 
+figLine <- figLine %>% add_trace(y = ~Area.Sown.more.than.once, name = 'Area Sown More than Once', line = list(shape='spline',color = 'rgb(22, 96, 167)', width = 4),mode = 'markers', marker = list(color = 'rgba(22, 96, 167)', size = 12))  
+
+figLine <- figLine %>% add_trace(y = ~Gross.Irrigated.Area, name = 'Gross Irrigated Area', line = list(shape='spline',color = 'black', width = 4),mode = 'markers', marker = list(color = 'black', size = 12)) 
+figLine <- figLine %>% add_trace(y = ~Cropping.Intensity, name = 'Crop Intensity', line = list(shape='spline',color = 'green', width = 4,dash='dash'))  
+figLine <- figLine %>% layout(title = "Changes in Gross Cropped Area and Irrigated Area",
+                      xaxis = list(title = "Years"),
+                      yaxis = list (title = "Million Hectares"))
+figLine
+```
+
+
+
+Total Exchg.
+================================================================================
+
+Column {.tabset}
+--------------------------------------------------------------------------------
+
+### Value of Imports vs Exports
+
+```{r}
+options(scipen = 1000)
+year <- c(rep("1990-91",2), rep("2000-01",2), rep("2010-11",2), rep("2011-12",2),
+          rep("2012-13",2), rep("2013-14",2), rep("2014-15",2),
+          rep("2015-16",2), rep("2016-17",2))
+type <- rep(c("Import","Export"),9)
+val1 <- c(1205.86,6012.76)
+val2 <- c(12086.23,28657.37)
+val3 <- c(51073.97,113046.58)
+val4 <- c(70164.51,182801.00)
+val5 <- c(95718.89,227192.61)
+val6 <- c(85727.30,262778.54)
+val7 <- c(121319.02,239681.04)
+val8 <- c(140289.22,215396.55)
+val9 <- c(164726.83,226651.94)
+value <- c(val1,val2,val3,val4,val5,val6,val7,val8,val9)
+
+data <- data.frame(year,type,value)
+gp <- ggplot(data, aes(fill=type, y=value, x=year))+geom_bar(position = "dodge", stat = "identity") + ylim(0,300000) +
+  labs(title = "Value of Imports & Exports in Crore Rupees",
+       y = "Value in Crore Rupees",
+       x = "Years",
+       fill = "Type")
+ggplotly(gp)
+
+```
+
+### Percentage share of Imports and Exports
+
+```{r}
+x<-read.csv(file="C:/Users/Zeus/Downloads/Five_Minus_Zero/Project DataFiles/Priyansh/dv_table1.csv", header = TRUE, sep=",")
+
+percent=c(x$Percentage.share.of.agricultural.imports,x$Percentage.share.of.agricultural.exports)
+df2<-data.frame(Percentage_share=rep(c("Import %","Export %"),each=9),years=rep(c(x$ï..Year),2),percentage=c(percent))
+ylimit<-c(seq(0,22.5,2.5))
+sp<-ggplot(data=df2,aes(x=years,y=percentage,group=Percentage_share))+geom_line(aes(color=Percentage_share),size=1.1,alpha=0.8)+geom_point(aes(color=Percentage_share),size=1.8,alpha=1.1)+ylim(0,20)+
+  labs(title = "Percentage Share of Imports & Exports",
+       y = "Percentage Value",
+       x = "Years",
+       color = "Percentage Share") +
+  theme_fivethirtyeight() + 
+  theme(axis.title = element_text()) 
+ggplotly(sp)
+
+```
+
+### Supply Estimates of Major Crops
+
+```{r}
+crop <- c(rep("Rice",3) , rep("Wheat",3) , rep("Cereal",3) ,rep("Pulses",3) ,rep("Sugar",3),
+          rep("Fruits",3), rep("Vegetables",3), rep("Oilseeds",3), rep("Cotton",3),
+          rep("Wool",3))
+year <- rep(c("2028-29","2029-30","2032-33"),10)
+ricev <- c(140.25,143.02,151.69)
+wheatv <- c(127.21,130.00,138.82)
+cerealv <- c(323.38,330.31,352.30)
+pulsesv <- c(29.79,30.75,33.95)
+sugarv <- c(41.54,42.24,44.44)
+fruitv <- c(167.83,175.92,202.66)
+vegetablev <- c(302.95,316.92,362.86)
+oilseedv <- c(51.00,52.07,59.96)
+cottonv <- c(83.43,90.13,113.94)
+woolv <- c(49.69,49.82,50.23)
+value <- c(ricev,wheatv,cerealv,pulsesv,sugarv,fruitv,vegetablev,oilseedv,cottonv,woolv)
+data <- data.frame(crop,year,value)
+
+myplot<-ggplot(data,aes(fill=year,y=value,x=crop)) + 
+  geom_bar(position="stack",stat = "identity") + coord_flip() +
+  labs(title = "Supply Estimates of Major Crops in India ",
+       y = "Quantity in Million Tonnes",
+       x = "Crops",
+       fill = "Year") +
+  scale_fill_manual(values = c("#bdf5ba","#7afa73","#22f716"))
+
+ggplotly(myplot)
+```
+
+
+
+Commodity Exc.
+================================================================================
+
+Column {.tabset}
+--------------------------------------------------------------------------------
+
+### Commodity Import
+
+```{r}
+
+import <- read.csv(file="C:/Users/Zeus/Downloads/Five_Minus_Zero/Project DataFiles/Mehak/dv_imports1.csv",header=TRUE)
+
+Commodity <- c(rep("Tea" , 3) , rep("Coffee" , 3) , rep("Wheat" , 3) , rep("Pulses" , 3) , rep("Sugar" , 3) , rep("Fruits" , 3) , rep("Vegetables" , 3) , rep("Cashew" , 3))
+
+year <- rep(c("2014-15" , "2015-16" , "2016-17"), 8)
+
+c<-cbind(import$X2014.15,import$X2015.16,import$X2016.17)
+f<-as.vector(t(c))
+Quantity<-abs(f)
+data<-data.frame(Commodity,year,Quantity)
+
+p<-ggplot(data, aes(fill=year, y=Quantity, x=Commodity)) + geom_bar(position="dodge", stat="identity", width=0.7) + ggtitle("Quantity in Ton of Imports") + coord_flip();
+ggplotly(p)
+```
+
+### Commodity Export
+
+```{r}
+z<-read.csv(file="C:/Users/Zeus/Downloads/Five_Minus_Zero/Project DataFiles/Om/dv_exports - Copy.csv",header = TRUE,sep=",")
+
+Commodity <- c(rep("tea" , 3) , rep("Coffee" , 3) , rep("Wheat" , 3) ,rep("Pulses" , 3) ,rep("Sugar" , 3) ,rep("Fruits" , 3) ,rep("Vegetables" , 3) ,rep("Cashew" , 3) )
+year <- rep(c("2014-15" , "2015-16" , "2016-17") , 8)
+c<-cbind(z$X2014.15,z$X2015.16,z$X2016.17)
+f<-as.vector(t(c))
+Quantity<-abs(f)
+data<-data.frame(Commodity,year,Quantity)
+p1=ggplot(data, aes(fill=year, y=Quantity, x=Commodity)) + geom_bar(position="dodge", stat="identity", width=0.7) + ggtitle("Quantity in Ton of Exports")  + coord_flip();
+ggplotly(p1)
+```
+
+
+Column {.tabset}
+--------------------------------------------------------------------------------
+
+### Import
+
+```{r}
+import <- read.csv(file="C:/Users/Zeus/Downloads/Five_Minus_Zero/Project DataFiles/Mehak/dv_imports1.csv",header=TRUE)
+
+Commodity <- c(rep("Tea" , 3) , rep("Coffee" , 3) , rep("Wheat" , 3) , rep("Pulses" , 3) , rep("Sugar" , 3) , rep("Fruits" , 3) , rep("Vegetables" , 3) , rep("Cashew" , 3))
+
+year <- rep(c("2014-15" , "2015-16" , "2016-17") ,8)
+
+c1<-cbind(import$X,import$X.1,import$X.2)
+f1<-as.vector(t(c1))
+Price<-abs(f1)
+data<-data.frame(Commodity,year,Price)
+
+p<-ggplot(data, aes(fill=year, y=Price, x=Commodity)) + geom_bar(position="dodge", stat="identity", width=0.7) + ggtitle("Price in Crores") + coord_flip();
+ggplotly(p)
+```
+
+### Export
+
+```{r}
+z<-read.csv(file="C:/Users/Zeus/Downloads/Five_Minus_Zero/Project DataFiles/Om/dv_exports - Copy.csv",header = TRUE,sep=",")
+
+Commodity <- c(rep("tea" , 3) , rep("Coffee" , 3) , rep("Wheat" , 3) ,rep("Pulses" , 3) ,rep("Sugar" , 3) ,rep("Fruits" , 3) ,rep("Vegetables" , 3) ,rep("Cashew" , 3) )
+year <- rep(c("2014-15" , "2015-16" , "2016-17") , 8)
+
+c1<-cbind(z$X,z$X.1,z$X.2)
+f1<-as.vector(t(c1))
+Price<-abs(f1)
+data<-data.frame(Commodity,year,Price)
+
+p2=ggplot(data, aes(fill=year, y=Price, x=Commodity)) + geom_bar(position="dodge", stat="identity", width=0.7) + ggtitle("Price in Crores of Exports") + coord_flip();
+ggplotly(p2)
+```
+
+
+
+Regression
+================================================================================
+
+Column {.tabset}
+--------------------------------------------------------------------------------
+
+### Regression About Import
+
+```{r}
+z<-read.csv(file="C:/Users/Zeus/Downloads/Five_Minus_Zero/Project DataFiles/Om/dv_table1 - Copy.csv")
+
+options(scipen = 1000)
+p <- ggplot(z, aes(x=Agricultural.Imports, y=Total.Imports)) +
+  geom_point(shape=1) +    # Use hollow circles
+  geom_smooth(method=lm)   # Add linear regression line
+ggplotly(p)
+```
+
+### Regression About Export
+
+```{r}
+z<-read.csv(file="C:/Users/Zeus/Downloads/Five_Minus_Zero/Project DataFiles/Om/dv_table1 - Copy.csv")
+
+options(scipen = 1000)
+p <- ggplot(z, aes(x=Agricultural.Exports, y=Total.Exports)) +
+  geom_point(shape=1) +    # Use hollow circles
+  geom_smooth(method=lm)   # Add linear regression line
+ggplotly(p)
+```
+
+
+
+Conclusion
+================================================================================
+
+Column
+--------------------------------------------------------------------------------
+
+### Inference about Crop Yield and Production
+
+```{r}
+filePath <- "C:/Users/Zeus/Downloads/Five_Minus_Zero/WordCloud/aryaan.txt"
+
+text <- readLines(filePath)
+docs <- Corpus(VectorSource(text))
+
+toSpace <- content_transformer(function (x , pattern ) gsub(pattern, " ", x))
+docs <- tm_map(docs, toSpace, "/")
+docs <- tm_map(docs, toSpace, "@")
+docs <- tm_map(docs, toSpace, "\\|")
+# Convert the text to lower case
+docs <- tm_map(docs, content_transformer(tolower))
+# Remove numbers
+docs <- tm_map(docs, removeNumbers)
+# Remove english common stopwords
+docs <- tm_map(docs, removeWords, stopwords("english"))
+# Remove your own stop word
+# specify your stopwords as a character vector
+docs <- tm_map(docs, removeWords, c("the", "is","are","of","it","so","has","in","him")) 
+# Remove punctuations
+docs <- tm_map(docs, removePunctuation)
+# Eliminate extra white spaces
+docs <- tm_map(docs, stripWhitespace)
+# Text stemming
+# docs <- tm_map(docs, stemDocument)
+dtm <- TermDocumentMatrix(docs)
+m <- as.matrix(dtm)
+v <- sort(rowSums(m),decreasing=TRUE)
+d <- data.frame(word = names(v),freq=v)
+set.seed(1234)
+wordcloud(words = d$word, freq = d$freq, min.freq = 1,
+          max.words=100, random.order=FALSE, rot.per=0.35, 
+          colors=brewer.pal(8, "Dark2"))
+```
+
+
+Column
+--------------------------------------------------------------------------------
+
+### Inference about Land Usage for Agriculture
+
+```{r}
+filePath <- "C:/Users/Zeus/Downloads/Five_Minus_Zero/WordCloud/abhirami.txt"
+
+text <- readLines(filePath)
+docs <- Corpus(VectorSource(text))
+
+toSpace <- content_transformer(function (x , pattern ) gsub(pattern, " ", x))
+docs <- tm_map(docs, toSpace, "/")
+docs <- tm_map(docs, toSpace, "@")
+docs <- tm_map(docs, toSpace, "\\|")
+# Convert the text to lower case
+docs <- tm_map(docs, content_transformer(tolower))
+# Remove numbers
+docs <- tm_map(docs, removeNumbers)
+# Remove english common stopwords
+docs <- tm_map(docs, removeWords, stopwords("english"))
+# Remove your own stop word
+# specify your stopwords as a character vector
+docs <- tm_map(docs, removeWords, c("the", "is","are","of","it","so","has","in","him")) 
+# Remove punctuations
+docs <- tm_map(docs, removePunctuation)
+# Eliminate extra white spaces
+docs <- tm_map(docs, stripWhitespace)
+# Text stemming
+# docs <- tm_map(docs, stemDocument)
+dtm <- TermDocumentMatrix(docs)
+m <- as.matrix(dtm)
+v <- sort(rowSums(m),decreasing=TRUE)
+d <- data.frame(word = names(v),freq=v)
+set.seed(1234)
+wordcloud(words = d$word, freq = d$freq, min.freq = 1,
+          max.words=200, random.order=FALSE, rot.per=0.35, 
+          colors=brewer.pal(8, "Dark2"))
+```
+
+
+Column
+--------------------------------------------------------------------------------
+
+### Inference about Imports & Exports of Agriculture Commodities
+
+```{r}
+filePath <- "C:/Users/Zeus/Downloads/Five_Minus_Zero/WordCloud/mehak.txt"
+
+text <- readLines(filePath)
+docs <- Corpus(VectorSource(text))
+
+toSpace <- content_transformer(function (x , pattern ) gsub(pattern, " ", x))
+docs <- tm_map(docs, toSpace, "/")
+docs <- tm_map(docs, toSpace, "@")
+docs <- tm_map(docs, toSpace, "\\|")
+# Convert the text to lower case
+docs <- tm_map(docs, content_transformer(tolower))
+# Remove numbers
+docs <- tm_map(docs, removeNumbers)
+# Remove english common stopwords
+docs <- tm_map(docs, removeWords, stopwords("english"))
+# Remove your own stop word
+# specify your stopwords as a character vector
+docs <- tm_map(docs, removeWords, c("the", "is","are","of","it","so","has","in","him")) 
+# Remove punctuation(s)
+docs <- tm_map(docs, removePunctuation)
+# Eliminate extra white spaces
+docs <- tm_map(docs, stripWhitespace)
+# Text stemming
+# docs <- tm_map(docs, stemDocument)
+dtm <- TermDocumentMatrix(docs)
+m <- as.matrix(dtm)
+v <- sort(rowSums(m),decreasing=TRUE)
+d <- data.frame(word = names(v),freq=v)
+set.seed(1234)
+wordcloud(words = d$word, freq = d$freq, min.freq = 1,
+          max.words=200, random.order=FALSE, rot.per=0.35, 
+          colors=brewer.pal(8, "Dark2"))
+```
+
+
+
+
+
+
+
